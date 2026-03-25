@@ -6,12 +6,13 @@ path_in = 'C:\\Repository\\ini_1c_blockly'
 path_out = 'C:\\test_ini\\'
 text = ''
 last_conf = ''
+last_conf1 = ''
 wrong_obj_without_api3 = ''
 
 
 
 def parse_blockly():
-    global path_in, text, last_conf, wrong_obj_without_api3
+    global path_in, text, last_conf, last_conf1, wrong_obj_without_api3
 
     with open("api3_accord", "r", encoding="utf-8") as f:
         api3_accord = json.load(f)
@@ -21,6 +22,8 @@ def parse_blockly():
             main_objects = {file: {}}
             subs = ['Blockly', '_read']
             if all(sub in file for sub in subs):
+                if file.find('ЭТрН') > -1 or file.find('ЗнП') > -1: #  пофиг на ЭПД, это не наше
+                    continue
                 conf = file[file.find('Dom1C')+5:file.find('_Blockly')]
                 pretty_name = file[file.find('Blockly')+8:file.find('_read')]
                 tree = ET.parse(root_dir + '\\' + file)
@@ -42,11 +45,12 @@ def parse_blockly():
                             if value.get("name") not in ['ТипИС', 'ИмяИС', 'ИдИС', 'INIT_VALUE', 'ИдСБИС', 'ИмяСБИС']:
                                 objects[block.get("type")].append(value.get("name"))
 
-                check_conf = last_conf != conf or last_conf == ''
-                conf_name = last_conf + '\n' if check_conf else ''
-                last_conf = conf
+
 
                 if objects:
+                    check_conf = last_conf != conf or last_conf == ''
+                    conf_name = last_conf + '\n' if check_conf else ''
+                    last_conf = conf
                     if check_conf:
                         text = text + conf + '\n'
 
@@ -57,6 +61,9 @@ def parse_blockly():
                         text = text + f"{api3_accord.get(key)}: {value}" + '\n'
                     text = text + '\n'
                 else:
+                    check_conf = last_conf1 != conf or last_conf1 == ''
+                    conf_name = last_conf1 + '\n' if check_conf else ''
+                    last_conf1 = conf
                     conf_name = last_conf + '\n' if check_conf else ''
                     wrong_obj_without_api3 = wrong_obj_without_api3 + conf_name + '     ' + pretty_name + '\n'
 
